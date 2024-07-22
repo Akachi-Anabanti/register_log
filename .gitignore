@@ -19,3 +19,6 @@ Makefile
 # Ignore IDE-specific files
 .vscode/
 .idea/
+
+# Ignore fingerprint data files
+*.fpr
