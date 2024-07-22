@@ -1,0 +1,21 @@
+# Ignore build directory
+
+build/
+
+# Ignore CMake build files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# Ignore compiled binaries
+*.o
+*.out
+*.exe
+
+# Ignore SQLite database files
+*.db
+
+# Ignore IDE-specific files
+.vscode/
+.idea/
