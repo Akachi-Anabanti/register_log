@@ -27,15 +27,15 @@ Staff* create_staff(int id, const char *name)
 	strncpy(staff->name, name, MAX_NAME_LENGTH - 1);
 	staff->name[MAX_NAME_LENGTH - 1] = '\0';
 	staff->last_check_in = 0;
-	staff_last_check_out = 0;
+	staff->last_check_out = 0;
 
 	return staff;
 }
 
-int staff_check _in(Staff* staff)
+int staff_check_in(Staff* staff)
 {
 	if (staff == NULL) return 0;
-	if (!verify_fingerprint())
+	if (!verify_fingerprint(staff->id))
 	{
 		printf("Fingerprint verification failed.\n");
 		return 0;
@@ -57,7 +57,7 @@ int staff_check _in(Staff* staff)
 int staff_check_out(Staff *staff)
 {
 	if (staff == NULL) return 0;
-	if (!verify_fingerprint())
+	if (!verify_fingerprint(staff->id))
 	{
 		printf("Fingerprint verification failed .\n");
 		return 0;
@@ -75,7 +75,7 @@ int staff_check_out(Staff *staff)
 	}
 
 	printf("%s checked out at %s", staff->name, ctime(&now));
-	return 1
+	return 1;
 }
 
 void free_staff(Staff *staff)

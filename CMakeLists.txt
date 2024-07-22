@@ -4,7 +4,7 @@ project (RegisterLog C)
 set (CMAKE_C_STANDARD 11)
 
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(FPRINT REQUIRED Libfprint-2)
+pkg_check_modules(FPRINT REQUIRED libfprint-2)
 pkg_check_modules(GTK4 REQUIRED gtk4)
 
 include_directories(include ${FPRINT_INCLUDE_DIRS} ${GTK4_INCLUDE_DIRS})
