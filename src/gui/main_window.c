@@ -150,7 +150,40 @@ static void on_enroll_staff_clicked(GtkWidget *widget, gpointer data){
 }
 
 
+static void on_visitor_log_clicked(GtkWidget *widgt, gpointer data){
+	GtkWidget *dialog, *content_area, *name_entry;
+	GtkDialogFlags flags = GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT;
 
+	dialog = gtk_dialog_new_with_buttons("Visitor Check-In",
+	GTK_WINDOW(data),
+	flags,
+	"Check-In",
+	GTK_RESPONSE_ACCEPT,
+	"Cancel",
+	GTK_RESPONSE_CANCEL, NULL);
+
+	content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+
+	gtk_container_add(GTK_CONTAINER(content_area), label);
+
+	name_entry = gtk_entry_new();
+	gtk_container_add(GTK_CONTAINER(content_area), name_entry);
+
+	gtk_widget_show_all(dialog);
+
+
+	gint result = gtk_dialog_run(GTK_DIALOG(dialog));
+	if (result == GTK_RESPONSE_ACCEPT){
+		const char *name = gtk_entry_get_text(GTK_ENTRY(name_entry));
+		if (visitor_check_in(name)){
+			show_message_dailog(GTK_WINDOW(data), "Visitor checked in successfully");
+		} else {
+			show_message_dailog(GTK_WINDOW(data), "Failed to check in Visitor");
+		}
+	}
+
+	gtk_widget_destroy(dialog);
+}
 
 
 GtkWidget *create_main_window(void)
