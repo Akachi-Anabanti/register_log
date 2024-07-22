@@ -11,7 +11,7 @@ include_directories(include ${FPRINT_INCLUDE_DIRS} ${GTK4_INCLUDE_DIRS})
 
 file(GLOB_RECURSE SOURCES "src/*.c")
 
-add_executable(register_log ${SOURCE})
+add_executable(register_log ${SOURCES})
 
 target_link_libraries(register_log
 	${FPRINT_LIBRARIES}

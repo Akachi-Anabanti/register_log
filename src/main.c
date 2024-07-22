@@ -1,7 +1,7 @@
 #include <gtk/gtk.h>
 #include "gui/main_window.h"
-#include "database.h"
-#include "fingerprint.h"
+#include "../include/database.h"
+#include "../include/fingerprint.h"
 #include <gtk/gtktypes.h>
 
 
