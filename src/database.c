@@ -2,6 +2,7 @@
 #include <sqlite3.h>
 #include <time.h>
 #include "../include/database.h"
+#include "../include/staff.h"
 
 /**Database instance */
 static sqlite3 *db;
@@ -121,6 +122,77 @@ int add_visitor_log(const char *name, time_t check_in_time)
 
 	sqlite3_finalize(stmt);
 	return 1;
+}
+
+
+int get_next_staff_id(){
+	const char *sql = "SELECT MAX(id) FROM staff;";
+	sqlite3_stmt *stmt;
+	int max_id = 0;
+
+	int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
+	if (rc != SQLITE_OK){
+		fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db));
+		return -1;
+	}
+
+	rc = sqlite3_step(stmt);
+	if (rc == SQLITE_ROW){
+		max_id = sqlite3_column_int(stmt, 0);
+	}
+
+	sqlite3_finalize(stmt);
+	return max_id + 1;
+}
+
+int add_staff_to_db(Staff *staff)
+{
+	const char *sql = "INSERT INTO staff (id, name) VALUES (?, ?);";
+	sqlite3_stmt *stmt;
+
+	int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
+	if (rc != SQLITE_OK){
+		fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db));
+		return 0;
+	}
+
+	sqlite3_bind_int(stmt, 1, staff->id);
+	sqlite3_bind_text(stmt, 2, staff->name, -1, SQLITE_STATIC);
+
+	rc = sqlite3_step(stmt);
+	if (rc != SQLITE_DONE)
+	{
+		fprintf(stderr, "Execution failed: %s\n", sqlite3_errmsg(db));
+		sqlite3_finalize(stmt);
+		return 0;
+	}
+
+	sqlite3_finalize(stmt);
+	return 1;
+
+}
+
+Staff *get_staff_by_id(int id){
+	const char *sql = "SELECT name FROM staff WHERE id = ?;";
+	sqlite3_stmt *stmt;
+	Staff *staff = NULL;
+
+	int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
+	if (rc != SQLITE_OK){
+		fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db));
+		return NULL;
+	}
+
+	sqlite3_bind_int(stmt, 1, id);
+
+	rc = sqlite3_step(stmt);
+	if (rc == SQLITE_ROW){
+		const char *name = (const char *)sqlite3_column_text(stmt, 0);
+		staff = create_staff(id, name);
+	}
+
+	sqlite3_finalize(stmt);
+	return staff;
 }
 
 /*Close the database after operations */

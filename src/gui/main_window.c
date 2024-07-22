@@ -4,23 +4,153 @@
 #include "../include/visitor.h"
 
 
+static void show_message_dailog(GtkWindow *parent, const char *message)
+{
+	GtkWidget *dialog = gtk_message_dialog_new(parent,
+											   GTK_DIALOG_DESTROY_WITH_PARENT,
+											   GTK_MESSAGE_INFO,
+											   GTK_BUTTONS_OK,
+											   "%s", message);
+	gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_widget_destroy(dialog);
+}
+
+
 static void on_staff_check_in_clicked(GtkWidget *widget, gpointer data)
 {
-	/*TODO: Implement staff check-in logic*/
-	g_print("Staff check-in clicked\n");
+	GtkWidget *dialog, *content_area, *id_entry;
+	GtkDialogFlags flags = GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT;
+
+	dialog = gtk_dialog_new_with_buttons("Staff Check-In",
+										 GTK_WINDOW(data),
+										 flags,
+										 "Check-In",
+										 GTK_RESPONSE_ACCEPT,
+										 "Cancel",
+										 GTK_RESPONSE_CANCEL,
+										 NULL);
+	content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+	GtkWidget *label = gtk_label_new("Enter staff ID:");
+	gtk_container_Ad(GTK_CONTAINER(content_area), label);
+
+
+	id_entry = gtk_entry_new();
+	gtk_contianer_add(GTK_CONTAINER(content_area), id_entry);
+
+	gtk_widget_show_all(dialog);
+
+
+	gint result = gtk_dialog_run(GTK_DIALOG(dialog));
+	if (result == GTK_RESPONSE_ACCEPT){
+		const char *id_str = gtk_entry_get_text(GTK_ENTRY(id_entry));
+		int id = atoi(id_str);
+		Staff *staff = get_staff_by_id(id);
+		if (staff){
+			if (staff_check_in(staff)){
+				show_message_dailog(GTK_WINDOW(data), "Staff checked in successfully");
+			} else {
+				show_message_dailog(GTK_WINDOW(data), "Failed to check in staff");
+			}
+		} else {
+			show_message_dailog(GTK_WINDOW(data), "Staff not found");
+		}
+	}
+
+	gtk_widget_destroy(dialog);
 }
 
 static void on_staff_check_out_clicked(GtkWidget *widget, gpointer data)
 {
-	/*TODO: Implement staff check-out logic*/
-	g_print("Staff checkout clicked\n");
+	GtkWidget *dialog, *content_area, *id_entry;
+	GtkDialogFlags flags = GTK_DIALOG_MODAL| GTK_DIALOG_DESTROY_WITH_PARENT;
+
+	dialog = gtk_dialog_new_with_buttons("Staff Check-Out",
+										 GTK_WINDOW(data),
+										 flags,
+										 "Check-Out",
+										 GTK_RESPONSE_ACCEPT,
+										 "Cancel",
+										 GTK_RESPONSE_CANCEL,
+										 NULL);
+
+	content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+
+	GtkWidget *label = gtk_label_new("Enter staff ID:");
+	gtk_container_add(GTK_CONTAINER(content_area), label);
+
+	id_entry = gtl_entry_new();
+	gtk_container_add(GTK_CONTAINER(content_area), id_entry);
+
+	gtk_widget_show_all(dialog);
+
+	gint result = gtk_dialog_run(GTK_DIALOG(dialog));
+	if (result == GTK_RESPONSE_ACCEPT){
+		const char *id_str = gtk_entry_get_trxt(GET_ENTRY(id_entry));
+		int id = atoi(id_str);
+		Staff *staff = get_staff_by_id(id);
+
+		if (staff) {
+			if (staff_check_out(staff)){
+				show_message_dailog(GTK_WINDOW(data), "Staff checked out successfully");
+			} else {
+				show_message_dailog(GTK_WINDOW(data), "Failed to check out staff");
+			}
+
+			free_staff(staff);
+		} else {
+			show_message_dailog(GTK_WINDOW(data), "Staff not found");
+		}
+	}
+	gtk_widget_destroy(dialog);
 }
+
 
 static void on_visitor_log_clicked(GtkWidget *widget, gpointer data)
 {
 	/*TODO: Implement visitor logging logic*/
 	g_print("Visitor log clicked \n");
 }
+
+
+static void on_enroll_staff_clicked(GtkWidget *widget, gpointer data){
+	GtkWidget *dialog, *content_area, *name_entry;
+	GtkDialogFlags flags = GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT;
+
+	dialog = gtk_dialog_new_with_buttons("Enroll New Staff",
+										  GTK_WINDOW(data),
+										  flags,
+										  "Enroll",
+										  GTK_RESPONSE_ACCEPT,
+										  "Cancel",
+										  GTK_RESPONSE_CANCEL,
+										  NULL);
+	content_area = gtk_dialog_get_content_area(GTK_DAILOG(dialog));
+	GtkWidget *label = gtk_label_new("Enter staff name:");
+	gtk_container_add(GTK_CONTAINER(content_area), label);
+
+
+	name_entry = gtk_entry_new();
+	gtk_container_add(GTK_CONTAINER(content_area), name_entry);
+
+
+	gtk_widget_show_all(dialog);
+
+	gint result = gtk_dialog_run(GTK_DIALOG(dialog));
+	if (result == GTK_RESPONSE_ACCEPT){
+		const char *name = gtk_entry_get_text(GTK_ENTRY(name_entry));
+
+		if (enroll_new_staff(name))
+		{
+			g_print("Staff enrolled successfully: %s\n", name);
+		} else {
+			g_print("Failed to enroll staff\n");
+		}
+	}
+	gtk_widget_destroy(dialog);
+}
+
+
+
 
 
 GtkWidget *create_main_window(void)
@@ -50,6 +180,11 @@ GtkWidget *create_main_window(void)
 	button = gtk_button_new_with_label("Visitor Log");
 	g_signal_connect(button, "clicked", G_CALLBACK(on_visitor_log_clicked), NULL);
 	gtk_grid_attach(GTK_GRID(grid), button, 0, 1, 2, 1);
-	return window;
-}
 
+	button = gtk_button_new_with_label("Enroll New Staff");
+	g_signal_connect(button, "clicked", G_CALLBACK(on_enroll_staff_clicked), window);
+	gtk_grid_attach(GTK_GRID(grid), button, 0, 2, 2, 1);
+
+	return window;
+
+}

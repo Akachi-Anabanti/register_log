@@ -6,14 +6,6 @@
 #include "../include/database.h"
 #include "../include/fingerprint.h"
 
-#define MAX_NAME_LENGTH 100
-
-struct Staff {
-	int id;
-	char name[MAX_NAME_LENGTH];
-	time_t last_check_in;
-	time_t last_check_out;
-};
 
 Staff* create_staff(int id, const char *name)
 {
@@ -30,6 +22,41 @@ Staff* create_staff(int id, const char *name)
 	staff->last_check_out = 0;
 
 	return staff;
+}
+
+int enroll_new_staff(const char *name)
+{
+	int new_id = get_next_staff_id();
+	if (new_id -1)
+	{
+		printf("Failed to get new staff ID.\n");
+		return 0;
+	}
+
+	Staff *new_staff = create_staff(new_id, name);
+	if (new_staff == NULL)
+	{
+		printf("Failed to create new staff.\n");
+		return 0;
+	}
+
+	if (!add_staff_to_db(new_staff))
+	{
+		printf("Failed to add staff to database.\n");
+		free_staff(new_staff);
+		return 0;
+	}
+
+	printf("Enrolling fingerprint for %s (ID %d) \n", name, new_id);
+	if (!enroll_fingerprint(new_id)){
+		printf("Failed to enroll fingerprint .\n");
+		free_staff(new_staff);
+		return 0;
+	}
+
+	printf("Staff member %s (ID: %d) successfully enrolled .\n", name, new_id);
+	free_staff(new_staff);
+	return 1;
 }
 
 int staff_check_in(Staff* staff)
@@ -73,7 +100,6 @@ int staff_check_out(Staff *staff)
 		return 0;
 
 	}
-
 	printf("%s checked out at %s", staff->name, ctime(&now));
 	return 1;
 }
