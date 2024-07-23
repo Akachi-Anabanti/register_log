@@ -23,7 +23,7 @@ Visitor *create_visitor(int id, const char *name){
     if (visitor == NULL) return NULL;
 
     visitor->id = id;
-    strncpy(visitor->name, name, MAX_NAME_LENGTH, -1);
+    strncpy(visitor->name, name, MAX_NAME_LENGTH - 1);
     visitor->name[MAX_NAME_LENGTH - 1] = '\0';
     visitor->check_in_time = 0;
     visitor->check_out_time = 0;

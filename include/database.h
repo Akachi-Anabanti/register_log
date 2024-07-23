@@ -3,6 +3,7 @@
 
 #include <time.h>
 #include "staff.h"
+#include <string.h>
 
 
 int initialize_database();

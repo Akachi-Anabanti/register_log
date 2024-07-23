@@ -19,7 +19,7 @@ int initialize_database()
 		return 0;
 	}
 
-	const char *sql_create_staff_table = "CREATE TABLE IF NOT staff ("
+	const char *sql_create_staff_table = "CREATE TABLE IF NOT EXISTS staff ("
 										 "id INTEGER PRIMARY KEY,"
 										 "name TEXT NOT NULL,"
 										 "last_check_in INTEGER,"
@@ -42,6 +42,8 @@ int initialize_database()
 		fprintf(stderr, "SQL error: %s\n", sqlite3_errmsg(db));
 		return 0;
 	}
+
+	return 1;
 }
 
 
